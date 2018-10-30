@@ -265,7 +265,7 @@ export default class Tooltip {
         this.toggle(false);
     }
 
-    toggle (visible, autoHide = true) {
+    toggle (visible, autoHide = true, onBlur = false) {
         let delay = this._options.delay;
 
         if (this._disabled === true) {
@@ -278,7 +278,7 @@ export default class Tooltip {
             visible = !this._visible;
         }
 
-        if (visible === true) {
+        if (visible === onBlur) {
             delay = 0;
         }
 
