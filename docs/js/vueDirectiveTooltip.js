@@ -2457,7 +2457,8 @@ var EVENTS = {
 
 var DEFAULT_OPTIONS = {
     container: false,
-    delay: 200,
+    onDelay: 200,
+    offDelay: 100,
     instance: null, // the popper.js instance
     fixIosSafari: false,
     eventsEnabled: true,
@@ -2707,8 +2708,7 @@ var Tooltip$2 = function () {
 
         var autoHide = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-        var delay = this._options.delay;
-
+        var delay = this._options.onDelay;
         if (this._disabled === true) {
             visible = false;
             delay = 0;
@@ -2719,8 +2719,8 @@ var Tooltip$2 = function () {
             visible = !this._visible;
         }
 
-        if (visible === true) {
-            delay = 0;
+        if (visible === false) {
+            delay = this._options.offDelay;
         }
 
         clearTimeout(this._clearDelay);
@@ -2856,8 +2856,8 @@ var Tooltip$1 = {
 };
 
 function filterBindings(binding) {
-    var delay = !binding.value || isNaN(binding.value.delay) ? Tooltip$2._defaults.delay : binding.value.delay;
-
+    var onDelay = !binding.value || isNaN(binding.value.onDelay) ? Tooltip$2._defaults.onDelay : binding.value.onDelay;
+    var offDelay = !binding.value || isNaN(binding.value.offDelay) ? Tooltip$2._defaults.offDelay : binding.value.offDelay;
     return {
         class: getClass(binding),
         html: binding.value ? binding.value.html : null,
@@ -2866,7 +2866,8 @@ function filterBindings(binding) {
         triggers: getTriggers(binding),
         fixIosSafari: binding.modifiers.ios || false,
         offset: binding.value && binding.value.offset ? binding.value.offset : Tooltip$2._defaults.offset,
-        delay: delay
+        onDelay: onDelay,
+        offDelay: offDelay
     };
 }
 
@@ -2982,12 +2983,21 @@ function getContent(_ref4) {
             return document.getElementById(value.html);
         } else if (isElement(value.html)) {
             return value.html;
+        } else if (value.html !== null) {
+            return htmlToElement(value.html);
         } else {
             return '';
         }
     } else {
         return '' + value;
     }
+}
+
+function htmlToElement(html) {
+    var template = document.createElement('template');
+    html = html.trim(); // Never return a text node of whitespace as the result
+    template.innerHTML = html;
+    return template.content.firstChild;
 }
 
 /**

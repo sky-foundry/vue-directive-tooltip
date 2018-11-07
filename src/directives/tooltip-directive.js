@@ -67,8 +67,8 @@ export default {
 };
 
 function filterBindings (binding) {
-    const delay = !binding.value || isNaN(binding.value.delay) ? Tooltip._defaults.delay : binding.value.delay;
-
+    const onDelay = !binding.value || isNaN(binding.value.onDelay) ? Tooltip._defaults.onDelay : binding.value.onDelay;
+    const offDelay = !binding.value || isNaN(binding.value.offDelay) ? Tooltip._defaults.offDelay : binding.value.offDelay;
     return {
         class: getClass(binding),
         html: (binding.value) ? binding.value.html : null,
@@ -77,7 +77,8 @@ function filterBindings (binding) {
         triggers: getTriggers(binding),
         fixIosSafari: binding.modifiers.ios || false,
         offset: (binding.value && binding.value.offset) ? binding.value.offset : Tooltip._defaults.offset,
-        delay
+        onDelay,
+        offDelay
     };
 }
 
@@ -184,12 +185,21 @@ function getContent ({value}) {
             return document.getElementById(value.html);
         } else if (isElement(value.html)) {
             return value.html;
+        } else if (value.html !== null) {
+            return htmlToElement(value.html);
         } else {
             return '';
         }
     } else {
         return `${value}`;
     }
+}
+
+function htmlToElement(html) {
+    var template = document.createElement('template');
+    html = html.trim(); // Never return a text node of whitespace as the result
+    template.innerHTML = html;
+    return template.content.firstChild;
 }
 
 /**
